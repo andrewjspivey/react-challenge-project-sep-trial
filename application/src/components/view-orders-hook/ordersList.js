@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import {convertUnixtoHHMMSS} from '../../../src/utils/timeFormat'
 import { SERVER_IP } from '../../private';
 
@@ -38,7 +39,9 @@ const OrdersList = (props) => {
                     <p>Quantity: {order.quantity}</p>
                 </div>
                 <div className="col-md-4 view-order-right-col">
-                    <button className="btn btn-success">Edit</button>
+                    <Link to={{pathname: '/order', order}}>
+                        <button className="btn btn-success">Edit</button>
+                    </Link>
                     <button onClick={() => deleteOrder(order._id)} className="btn btn-danger">Delete</button>
                 </div>
             </div>
