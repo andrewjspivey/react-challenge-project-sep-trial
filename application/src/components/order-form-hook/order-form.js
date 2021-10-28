@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { Template } from '../../components';
 import { SERVER_IP } from '../../private';
@@ -7,30 +8,52 @@ import './orderForm.css';
 const ADD_ORDER_URL = `${SERVER_IP}/api/add-order`;
 
 export default function OrderForm(props) {
-    const [orderItem, setOrderItem] = useState("");
-    const [quantity, setQuantity] = useState("1");
+    const location = useLocation()
+    const { order } = location;
 
-    const menuItemChosen = (event) => setOrderItem(event.value);
-    const menuQuantityChosen = (event) => setQuantity(event.value);
+    const [orderItem, setOrderItem] = useState(order ? order.order_item : "");
+    const [quantity, setQuantity] = useState(order ? order.quantity : "1");
+
+    const menuItemChosen = (event) => setOrderItem(event.target.value);
+    const menuQuantityChosen = (event) => setQuantity(event.target.value);
 
     const auth = useSelector((state) => state.auth);
 
     const submitOrder = () => {
         if (orderItem === "") return;
-        fetch(ADD_ORDER_URL, {
-            method: 'POST',
-            body: JSON.stringify({
-                order_item: orderItem,
-                quantity,
-                ordered_by: auth.email || 'Unknown!',
-            }),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(res => res.json())
-        .then(response => console.log("Success", JSON.stringify(response)))
-        .catch(error => console.error(error));
+        if (order) {
+            fetch(`${SERVER_IP}/api/edit-order`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    id: order._id,
+                    order_item: orderItem,
+                    quantity: quantity,
+                    ordered_by: auth.email || 'Unknown!',
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(response => console.log("Success", JSON.stringify(response)))
+            .then(alert(`Order Updated to ${quantity} ${orderItem}` ))
+            .catch(error => console.error(error));
+        } else {
+            fetch(ADD_ORDER_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    order_item: orderItem,
+                    quantity,
+                    ordered_by: auth.email || 'Unknown!',
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(response => console.log("Success", JSON.stringify(response)))
+            .catch(error => console.error(error));
+        }
     }
 
     return (
@@ -58,7 +81,9 @@ export default function OrderForm(props) {
                         <option value="5">5</option>
                         <option value="6">6</option>
                     </select>
-                    <button type="button" className="order-btn" onClick={() => submitOrder()}>Order It!</button>
+                    <button type="button" className="order-btn" onClick={() => submitOrder()}>
+                        {order ? "Update Order" : "Order It!"}
+                    </button>
                 </form>
             </div>
         </Template>
