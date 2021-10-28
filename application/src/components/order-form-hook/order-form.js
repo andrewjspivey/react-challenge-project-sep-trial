@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Template } from '../../components';
-import { SERVER_IP } from '../../private';
+import { addOrder, editOrder } from '../../redux/actions/orderActions';
 import './orderForm.css';
 
-const ADD_ORDER_URL = `${SERVER_IP}/api/add-order`;
 
 export default function OrderForm(props) {
     const location = useLocation()
     const { order } = location;
+    const dispatch = useDispatch()
 
     const [orderItem, setOrderItem] = useState(order ? order.order_item : "");
     const [quantity, setQuantity] = useState(order ? order.quantity : "1");
@@ -22,37 +22,9 @@ export default function OrderForm(props) {
     const submitOrder = () => {
         if (orderItem === "") return;
         if (order) {
-            fetch(`${SERVER_IP}/api/edit-order`, {
-                method: 'POST',
-                body: JSON.stringify({
-                    id: order._id,
-                    order_item: orderItem,
-                    quantity: quantity,
-                    ordered_by: auth.email || 'Unknown!',
-                }),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(response => console.log("Success", JSON.stringify(response)))
-            .then(alert(`Order Updated to ${quantity} ${orderItem}` ))
-            .catch(error => console.error(error));
+            dispatch(editOrder(order._id, orderItem, quantity, auth))
         } else {
-            fetch(ADD_ORDER_URL, {
-                method: 'POST',
-                body: JSON.stringify({
-                    order_item: orderItem,
-                    quantity,
-                    ordered_by: auth.email || 'Unknown!',
-                }),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(res => res.json())
-            .then(response => console.log("Success", JSON.stringify(response)))
-            .catch(error => console.error(error));
+            dispatch(addOrder(orderItem, quantity, auth))
         }
     }
 

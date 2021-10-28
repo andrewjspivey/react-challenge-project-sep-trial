@@ -1,29 +1,22 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import {convertUnixtoHHMMSS} from '../../../src/utils/timeFormat'
-import { SERVER_IP } from '../../private';
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteOrder } from '../../redux/actions/orderActions';
 
 const OrdersList = (props) => {
-    const { orders, setOrders } = props;
-    if (!props || !props.orders || !props.orders.length) return (
+    const orders = useSelector(state => state.orders.orders);
+    const auth = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
+
+    if ( !orders || !orders.length) return (
         <div className="empty-orders">
             <h2>There are no orders to display</h2>
         </div>
     );
 
-        const deleteOrder = (orderId) => {
-        fetch(`${SERVER_IP}/api/delete-order`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                id: orderId
-            })
-        }).then(res => {
-            setOrders(orders.filter(order => order._id !== orderId)
-            )
-        }).catch(error => console.log(error))
+    const deleteOrderHandler = (orderId) => {
+        dispatch(deleteOrder(orderId))
     }
 
     return orders.map(order => {
@@ -42,7 +35,7 @@ const OrdersList = (props) => {
                     <Link to={{pathname: '/order', order}}>
                         <button className="btn btn-success">Edit</button>
                     </Link>
-                    <button onClick={() => deleteOrder(order._id)} className="btn btn-danger">Delete</button>
+                    <button onClick={() => deleteOrderHandler(order._id)} className="btn btn-danger">Delete</button>
                 </div>
             </div>
         );
