@@ -17,6 +17,7 @@ const RegisterForm = (props) => {
               password: userData.password,
             }
           )
+        props.onRegister()
       } catch (err) {
         console.log(err.response.data.msg);
         alert(err.response.data.msg);

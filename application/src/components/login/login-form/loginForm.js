@@ -1,28 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {useDispatch} from 'react-redux'
 import { loginUser } from '../../../redux/actions/authActions'
+import {Link} from 'react-router-dom'
 
 
 const LoginForm = (props) => {
     const [userData, setUserData] = useState({email: "", password: ""})
     const dispatch = useDispatch()
 
-  const login = (e) => {
-    e.preventDefault();
-    try {
-      dispatch(loginUser(userData.email, userData.password))
-    } catch (err) {
-      console.log(err.response.data.msg);
-      alert(err.response.data.msg);
+    const login = (e) => {
+      e.preventDefault();
+      try {
+        dispatch(loginUser(userData.email, userData.password))
+      } catch (err) {
+        console.log(err);
+      }
     }
-  }
 
-  const onChange = (e) => {
-    setUserData({ ...userData, [e.target.name]: e.target.value});
-  }
-
+    const onChange = (e) => {
+      setUserData({ ...userData, [e.target.name]: e.target.value});
+    }
 
     return (
+      <>
       <form onSubmit={login}>
         <div className="form-group">
           <label htmlFor="inputEmail">Email</label>
@@ -39,7 +39,16 @@ const LoginForm = (props) => {
         <div className="d-flex justify-content-center">
             <button type="submit" className="btn btn-primary">Login</button>
         </div>
+        <div style={{textAlign: 'center'}}>
+        No Account?
+        </div>
+        <div className="d-flex justify-content-center">
+          <Link to={'/register'}>
+            <button className="btn btn-secondary">Register</button>
+          </Link>
+        </div>
       </form>
+      </>
     );
 }
 
