@@ -1,46 +1,46 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux'; 
+import React, { useState, useEffect } from 'react';
+import {useDispatch} from 'react-redux'
 import { loginUser } from '../../../redux/actions/authActions'
 
-const mapActionsToProps = dispatch => ({
-  commenceLogin(email, password) {
-    dispatch(loginUser(email, password))
-  }
-})
 
-class LoginForm extends Component {
-  state = {
-    email: "",
-    password: "",
-  }
+const LoginForm = (props) => {
+    const [userData, setUserData] = useState({email: "", password: ""})
+    const dispatch = useDispatch()
 
-  login(e) {
+  const login = (e) => {
     e.preventDefault();
-    this.props.commenceLogin(this.state.email, this.state.password);
-    this.props.onLogin();
+    try {
+      dispatch(loginUser(userData.email, userData.password))
+    } catch (err) {
+      console.log(err.response.data.msg);
+      alert(err.response.data.msg);
+    }
   }
 
-  onChange(key, val) {
-    this.setState({ [key]: val });
+  const onChange = (e) => {
+    setUserData({ ...userData, [e.target.name]: e.target.value});
   }
 
-  render() {
+
     return (
-      <form>
+      <form onSubmit={login}>
         <div className="form-group">
           <label htmlFor="inputEmail">Email</label>
-          <input type="text" className="form-control" id="inputEmail" placeholder="test@test.com" value={this.state.email} onChange={e => this.onChange('email', e.target.value)}></input>
+          <input type="text" className="form-control" id="inputEmail"
+          name="email" placeholder="test@test.com" 
+          value={userData.email} onChange={onChange}></input>
         </div>
         <div className="form-group">
           <label htmlFor="inputPassword">Password</label>
-          <input type="password" className="form-control" id="inputPassword" value={this.state.password} onChange={e => this.onChange('password', e.target.value)}></input>
+          <input type="password" className="form-control" id="inputPassword"
+          name="password" value={userData.password}
+          onChange={onChange}></input>
         </div>
         <div className="d-flex justify-content-center">
-            <button onClick={e => this.login(e)} type="submit" className="btn btn-primary">Login</button>
+            <button type="submit" className="btn btn-primary">Login</button>
         </div>
       </form>
     );
-  }
 }
 
-export default connect(null, mapActionsToProps)(LoginForm);
+export default LoginForm
