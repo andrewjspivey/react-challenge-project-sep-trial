@@ -1,12 +1,20 @@
-import React, { useState } from 'react';
-import {useDispatch} from 'react-redux'
-import { loginUser } from '../../../redux/actions/authActions'
+import React, { useState, useEffect } from 'react';
+import {useDispatch, useSelector} from 'react-redux'
 import {Link} from 'react-router-dom'
+import { loginUser, logoutUser } from '../../../redux/actions/authActions'
 
 
 const LoginForm = (props) => {
     const [userData, setUserData] = useState({email: "", password: ""})
+    const loginError = useSelector(state => state.auth.error)
     const dispatch = useDispatch()
+
+    useEffect(() => {
+      if (loginError) {
+        alert(loginError)
+        dispatch(logoutUser())
+      }
+    }, [loginError])
 
     const login = (e) => {
       e.preventDefault();

@@ -6,28 +6,21 @@ import axios from 'axios'
 const RegisterForm = (props) => {
   const [userData, setUserData] = useState({email: "", password: ""})
 
- const registerUser = async (e) => {
+  const registerUser = async (e) => {
       e.preventDefault();
       try {
-        await axios
-          .post(
-            `${SERVER_IP}/api/register`,
-            {
-              email: userData.email,
-              password: userData.password,
-            }
+        await axios.post(
+            `${SERVER_IP}/api/register`, userData
           )
         props.onRegister()
       } catch (err) {
-        console.log(err.response.data.msg);
         alert(err.response.data.msg);
       }
-}
+  }
 
   const onChange = (e) => {
       setUserData({ ...userData, [e.target.name]: e.target.value});
     }
-
 
     return (
       <form onSubmit={registerUser}>

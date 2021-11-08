@@ -1,5 +1,13 @@
-import { LOGIN, LOGOUT } from './types';
+import { LOGIN, LOGOUT, ERROR } from './types';
 import { SERVER_IP } from '../../private'
+
+
+const setErrors = (error) => {
+    return {
+        type: ERROR,
+        payload: error
+    }
+}
 
 const finishLogin = (email, token) => {
     return {
@@ -28,6 +36,7 @@ export const loginUser = (email, password) => {
             if (response.success) {
                 dispatch(finishLogin(response.email, response.token));
             }
+            else dispatch(setErrors(response.msg))
         });
     };
 };
